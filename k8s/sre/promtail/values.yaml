@@ -1,0 +1,30 @@
+priorityClassName: node-critical.ops.dapperlabs.com
+config:
+  # TODO update me
+  lokiAddress: https://<loki-api>/api/prom/push
+  snippets:
+    # TODO update me
+    extraClientConfigs: |
+      basic_auth:
+        username: <loki-user>
+        password_file: /run/secrets/grafana/password
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+extraVolumes:
+  - name: grafana-metrics-publisher
+    secret:
+      secretName: grafana-metrics-publisher
+      items:
+        - key: password
+          path: password
+      defaultMode: 420
+      optional: false
+extraVolumeMounts:
+  - name: grafana-metrics-publisher
+    mountPath: /run/secrets/grafana
+    readOnly: true

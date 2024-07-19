@@ -1,0 +1,69 @@
+name: Grafana Adaptive Metrics
+on: 
+  workflow_dispatch:
+    inputs:
+      scenario:
+          description: "Job to run"
+          required: true
+          type: choice
+          options:
+           - Get recommendations
+           - Get recommendations - verbose
+           - Apply rules
+
+jobs:
+  grafana-adaptive-metrics:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Confirming Input Scenario
+      run: echo "scenario is ${{ inputs.scenario }}"
+
+    - name: Fetch data without verbose
+      if: inputs.scenario == 'Get recommendations'
+      run: |
+        curl --silent \
+             --user "${{ vars.GRAFANA_ADAPTIVE_METRICS_TENANT }}:${{ secrets.GRAFANA_ADAPTIVE_METRICS_KEY }}" \
+             --output non_verbose.json "${{ vars.GRAFANA_ADAPTIVE_METRICS_URL }}/aggregations/recommendations"
+
+    - name: Upload non-verbose artifact
+      if: inputs.scenario == 'Get recommendations'
+      uses: actions/upload-artifact@v3
+      with:
+        name: non-verbose-artifact
+        path: non_verbose.json
+
+    - name: Fetch data with verbose
+      if: inputs.scenario == 'Get recommendations - verbose'
+      run: |
+        curl --silent \
+             --user "${{ vars.GRAFANA_ADAPTIVE_METRICS_TENANT }}:${{ secrets.GRAFANA_ADAPTIVE_METRICS_KEY }}" \
+             --output verbose.json "${{ vars.GRAFANA_ADAPTIVE_METRICS_URL }}/aggregations/recommendations?verbose=true"
+
+    - name: Upload verbose artifact
+      if: inputs.scenario == 'Get recommendations - verbose'
+      uses: actions/upload-artifact@v3
+      with:
+        name: verbose-artifact
+        path: verbose.json
+
+    - name: Apply rules
+      if: inputs.scenario == 'Apply rules'
+    #   https://grafana.com/docs/grafana-cloud/cost-management-and-billing/reduce-costs/metrics-costs/control-metrics-usage-via-adaptive-metrics/adaptive-metrics-api/#upload-rules-back
+      run: |
+        curl --silent \
+        --user "${{ vars.GRAFANA_ADAPTIVE_METRICS_TENANT }}:${{ secrets.GRAFANA_ADAPTIVE_METRICS_KEY }}" \
+        --dump-header headers.txt \
+        "${{ vars.GRAFANA_ADAPTIVE_METRICS_URL }}/aggregations/rules"
+
+        TMPFILE=$(mktemp)
+        trap 'rm "$TMPFILE"' EXIT
+
+        cat headers.txt | grep -i '^etag:' | sed 's/^ETag:/If-Match:/i' > "$TMPFILE"
+
+        curl --silent --request POST --header @"$TMPFILE" \
+             --data-binary @.github/grafana-adaptive-metrics-rules.json \
+             --user "${{ vars.GRAFANA_ADAPTIVE_METRICS_TENANT }}:${{ secrets.GRAFANA_ADAPTIVE_METRICS_KEY }}" \
+             "${{ vars.GRAFANA_ADAPTIVE_METRICS_URL }}/aggregations/rules"

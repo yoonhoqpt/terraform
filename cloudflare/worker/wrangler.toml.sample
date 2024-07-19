@@ -1,0 +1,9 @@
+name = "<cloudflare-worker-name>"
+type = "javascript"
+account_id = "account_id = "ea64206f699cea3433e5d8460ca5d791"
+
+[env.dev]
+name = "<name>"
+zone_id = "<app-subdomain-zone>"
+route = "*app.subdomain/*"
+vars = { ENVIRONMENT = "dev" }

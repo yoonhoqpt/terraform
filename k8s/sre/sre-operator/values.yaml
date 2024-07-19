@@ -1,0 +1,8 @@
+nodeSelector:
+  ops.dapperlabs.com/preferred-namespace: sre
+google:
+  workloadIdentity: true
+# kmsKeyOverride: projects/dapper-ops/locations/global/keyRings/sre/cryptoKeys/prototype-wrapped-secrets
+serviceAccount:
+  create: false # don't need to create - this will be done in WLI for the cluster
+  name: sre-operator

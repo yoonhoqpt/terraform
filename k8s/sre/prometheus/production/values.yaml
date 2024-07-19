@@ -1,0 +1,14 @@
+server:
+  global:
+    external_labels:
+      env: production
+# extraScrapeConfigs: |
+#   - job_name: redis-enterprise
+#     scrape_interval: 30s
+#     scrape_timeout: 30s
+#     metrics_path: /
+#     scheme: https
+#     tls_config:
+#       insecure_skip_verify: true
+#     static_configs:
+#       - targets: ["<redis cluster url>"]

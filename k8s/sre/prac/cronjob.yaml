@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prac
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prac-role
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "delete"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "delete"]
+- apiGroups: ["ops.dapperlabs.com"]
+  resources: ["wrappedsecrets"]
+  verbs: ["get", "list", "watch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prac-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prac-role
+subjects:
+- kind: ServiceAccount
+  name: prac
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prac
+spec:
+  schedule: "15 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: prac
+          containers:
+          - name: prac
+            image: us-west1-docker.pkg.dev/dl-shared-artifacts/sre/prac:4843a5f48bdec08fee7f05f1d5d2e3207a0f024f
+            env:
+              - name: GITHUB_ORG
+                value: "dapperlabs"
+              - name: GITHUB_REPO
+                value: ""
+              - name: K8S_NAMESPACE
+                value: ""
+              - name: LOG_LEVEL
+                value: "debug"
+              - name: DRY_RUN
+                value: "true"
+              - name: WRAPPED_SECRETS
+                value: "false"
+              - name: GITHUB_TOKEN
+                valueFrom:
+                  secretKeyRef:
+                    name: prac
+                    key: githubToken
+          restartPolicy: OnFailure

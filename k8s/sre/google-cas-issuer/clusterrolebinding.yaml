@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sre-google-cas-issuer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cert-manager-google-cas-issuer
+subjects:
+- kind: ServiceAccount
+  name: sa-google-cas-issuer
+  namespace: cert-manager
+
+

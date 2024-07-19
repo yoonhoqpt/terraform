@@ -1,0 +1,6 @@
+spec:
+  template:
+    spec:
+      serviceAccount: sa-google-cas-issuer
+      serviceAccountName: sa-google-cas-issuer
+

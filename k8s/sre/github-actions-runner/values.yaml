@@ -1,0 +1,17 @@
+replicaCount: 2
+nodeSelector:
+  ops.dapperlabs.com/preferred-namespace: sre
+syncPeriod: 5m
+authSecret:
+  create: false
+  name: github-actions-credentials
+image:
+  # Built and pushed by https://github.com/dapperlabs/sre-github-actions-runner
+  actionsRunnerRepositoryAndTag: us-west1-docker.pkg.dev/sre-artifacts/sre/action-runner:v1.5.5
+resources:
+  limits:
+    cpu: 512m
+    memory: 1Gi
+  requests:
+    cpu: 256m
+    memory: 512Mi

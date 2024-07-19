@@ -1,0 +1,31 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: app-github-actions-runner
+spec:
+  replicas: 1
+  template:
+    spec:
+      # TODO update me
+      repository: dapperlabs/<product>-app # NOTE: Github user dapper-sre-atlantis must have admin access to this repo
+      labels:
+        # TODO update me
+        - <product>-app-cd
+      env: []
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: api-github-actions-runner
+spec:
+  replicas: 1
+  template:
+    spec:
+      # TODO update me
+      repository: dapperlabs/<product>-api # NOTE: Github user dapper-sre-atlantis must have admin access to this repo
+      labels:
+        # TODO update me
+        - <product>-api-cd
+      env: []
+      nodeSelector:
+        ops.dapperlabs.com/preferred-namespace: backend

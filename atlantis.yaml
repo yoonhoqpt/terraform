@@ -1,0 +1,37 @@
+version: 3
+automerge: true
+projects:
+  - name: Common
+    dir: terraform/common
+    terraform_version: 1.3.9
+    workflow: main
+    autoplan:
+      enabled: true
+      when_modified:
+        - "*.tf"
+  # TODO update me - uncomment staging project
+  # - name: Staging
+  #   dir: terraform/staging
+  #   terraform_version: 1.3.9
+  #   workflow: main
+  #   autoplan:
+  #     enabled: true
+  #     when_modified:
+  #       - "*.tf"
+# Custom workflows
+# https://www.runatlantis.io/docs/custom-workflows.html
+workflows:
+  main:
+    plan:
+      steps:
+        # Add extra arguments to terraform commands
+        # https://www.runatlantis.io/docs/custom-workflows.html#use-cases
+        - init:
+            extra_args:
+              - "-backend-config=backend.tfvars"
+        # Custom steps
+        # https://www.runatlantis.io/docs/custom-workflows.html#custom-init-plan-apply-commands
+        # https://www.runatlantis.io/docs/custom-workflows.html#reference
+        - run: /atlantis/bin/terraform${ATLANTIS_TERRAFORM_VERSION} fmt -check -recursive -no-color
+        - run: /atlantis/bin/terraform${ATLANTIS_TERRAFORM_VERSION} validate -no-color
+        - plan

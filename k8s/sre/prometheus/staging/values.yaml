@@ -1,0 +1,5 @@
+server:
+  global:
+    external_labels:
+      env: staging
+  retention: 5m

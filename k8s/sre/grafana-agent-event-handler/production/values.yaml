@@ -1,0 +1,4 @@
+agent:
+  extraEnv:
+    - name: ENV
+      value: production

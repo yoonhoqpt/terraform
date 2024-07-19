@@ -1,0 +1,17 @@
+# Github actions makes it hard to test new workflow_dispatch workflows
+# because the workflow definition needs to be in the main branch for it to
+# appear in the actions tab.
+# This workflow is meant to be used during development so we don't have to check
+# in a new file to master every time we need to add a new workflow.
+
+name: Placeholder workflow
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Noop
+    # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
+    runs-on: ubuntu-20.04
+    steps:
+      - run: echo "I'm a placeholder"

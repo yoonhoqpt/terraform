@@ -1,0 +1,11 @@
+config:
+  receivers:
+    googlecloudspanner:
+      projects:
+        - project_id: # TODO: "dl-projectname-environment"
+          instances:
+            - instance_id: # TODO: "instancename-environment"
+              databases:
+                - # TODO: "list"
+                - # TODO: "databases"
+                - # TODO: "here"

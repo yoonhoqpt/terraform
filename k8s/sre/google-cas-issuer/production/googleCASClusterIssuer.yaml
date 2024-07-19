@@ -1,0 +1,9 @@
+apiVersion: cas-issuer.jetstack.io/v1beta1
+kind: GoogleCASClusterIssuer
+metadata:
+  name: googlecasclusterissuer
+spec:
+  project: dl-<product>-production #TODO: replace me
+  location: <region> #TODO: replace me. ex: us-west1
+  caPoolId: subordinate-ca-pool-dl-<product>-production #TODO: replace me
+

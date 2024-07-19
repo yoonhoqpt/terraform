@@ -1,0 +1,2 @@
+extraArgs:
+  - "-client.external-labels=env=production"

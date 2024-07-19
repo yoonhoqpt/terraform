@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../base/
+
+# Can add additional environment specific policies this way.
+# OR stick with a specific version of policies for this env
+# for a time.
+# resources:
+#   - https://raw.githubusercontent.com/kyverno/policies/main/best-practices/add_ns_quota/add_ns_quota.yaml
+#   - https://github.com/dapperlabs/kyverno-policies?ref=specific-version-goes-here
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/validationFailureAction
+        value: audit
+    target:
+      kind: ClusterPolicy
+      annotationSelector: "ops.dapperlabs.com/audit=true"
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/preconditions/all/0/value
+        value: ["sre", "kube-system"]
+    target:
+      kind: ClusterPolicy
+      annotationSelector: "ops.dapperlabs.com/namespace=true"
+
+# If you need to delete a specific policy for a specific environment.
+# patchesStrategicMerge:
+# - |-
+#   apiVersion: kyverno.io/v1
+#   kind: ClusterPolicy
+#   metadata:
+#     name: policy-name-goes-here
+#   $patch: delete

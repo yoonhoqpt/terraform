@@ -1,0 +1,58 @@
+agent:
+  mode: static
+  listenPort: 8000
+  enableReporting: false
+  extraArgs:
+    - -enable-features=integrations-next
+    - -config.expand-env
+  mounts:
+    extra:
+      - name: grafana-metrics-publisher
+        mountPath: /run/secrets/grafana
+        readOnly: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: .5
+    limits:
+      memory: 1Gi
+      cpu: 1
+  configMap:
+    content: |-
+      server:
+        log_level: info
+        log_format: json
+      integrations:
+        eventhandler:
+          cache_path: "/etc/eventhandler/eventhandler.cache"
+      logs:
+        configs:
+        - name: default
+          clients:
+          # TODO update me
+          - url: https://<loki-instance-host>/api/prom/push
+            basic_auth:
+              # TODO update me
+              username: <update-me>
+              password_file: /run/secrets/grafana/password
+            external_labels:
+              env: ${ENV}
+          positions:
+            filename: /tmp/positions0.yaml
+controller:
+  type: statefulset
+  replicas: 1
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 2000
+    fsGroup: 2000
+  volumes:
+    extra:
+      - name: grafana-metrics-publisher
+        secret:
+          secretName: grafana-metrics-publisher
+          items:
+            - key: password
+              path: password
+          defaultMode: 420
+          optional: false
